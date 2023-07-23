@@ -50,8 +50,7 @@ void DFS2(int v) {
     }
 }
 
-void findStrongConComp(int n, int v) {
-
+void findStrongConComp(int n) {
     used.assign (n, false); // инициализация
     for (int i = 0; i < n; ++i){
         if (!used[i]){ // если не посещена
@@ -128,7 +127,7 @@ int main() {
             in >> G[i][j];
         }
     }
-
+// Inverting the source graph
     for (int i=0; i<n; ++i){
         for(int j=0; j<n; ++j){
             IG [i][j] = G[j][i];
@@ -151,22 +150,8 @@ int main() {
         cout << "\n";
     }
 
-    used.assign (n, false); // инициализация
-    for (int i = 0; i < n; ++i){
-        if (!used[i]){ // если не посещена
-            DFS1 (i);
-        }
-    }
-    used.assign (n, false);
-    for (int i = 0; i < n; ++i) {
-        int v = order[n - 1 - i]; // в обратном порядке с конца вектора
-        if (!used[v]) {
-            DFS2(v);
-            SCC++;
-            StrongConComp.push_back(component);
-            component.clear();
-        }
-    }
+    findStrongConComp(n);
+
         in.close();
     }
     else {
