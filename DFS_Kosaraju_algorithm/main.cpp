@@ -75,7 +75,7 @@ int main() {
 
 //Создаём файловый поток и связываем его с файлом
 //Create a file stream and link it to the file
-    std::ifstream in("..\\adjacency_matrices\\directed\\m1.txt");
+    std::ifstream in("..\\adjacency_matrices\\directed\\m2.txt");
     std::ofstream out("..\\output.txt");
 
 

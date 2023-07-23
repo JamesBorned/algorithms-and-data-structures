@@ -1,4 +1,5 @@
-3 6 
-4 5 7 
+5 
+4 
+3 
 0 1 2 
-A number of connected components is 3
+A number of connected components is 4
