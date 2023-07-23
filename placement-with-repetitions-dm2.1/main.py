@@ -17,5 +17,5 @@ for a in letters: #a..f - позиции букв в новом слове
                 for e in letters:
                     for f in letters:
                         word = a+b+c+d+e+f
-                        k.add(word)
+                        k.add(word)                                          
 print(len(k))

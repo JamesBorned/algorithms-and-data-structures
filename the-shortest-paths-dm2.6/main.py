@@ -8,16 +8,10 @@ for i in range(12):
     for j in range(17):
         if i == 11 or j == 0:
             field[i][j] = 1
-        #else:
-            #field[i][j] = field[i-1][j] + field[i][j-1]
-            #field[i][j] = field[i + 1][j]
 
 #заполнение матрицы, каждый элемент которой - количество путей до
 #определённой клетки прямоугольника
-#нумерация идёт от верхнего левого к нижнему правому, надо наоборот
-#поэтому вот
-#прикольная реализация
-#ещё ниже - рациональней
+
 i = 10
 j = 1
 while j < 16:
@@ -46,14 +40,6 @@ for i in range(11, -1, -1):
         else:
             field[i][j] = field[i+1][j] + field[i][j-1]
             #print(field[i][j])
-       #'''elif i-j==0:
-           # field[i][j] = field[i+1][j] + field[i][j-1] - field[i-2][j]
-        #else:
-            #field[i][j] = field[i+1][j] + field[i][j-1] - field[i-2][j]
-            #field[i][j] = 0'''
-            #field[i][j] = field[i - 1][j] + field[i][j - 1]
-           # if field[i][j] < 0:
-               # field[i][j] = 0
 
 print(*field, sep='\n')
 
