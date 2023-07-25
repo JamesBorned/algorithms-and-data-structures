@@ -25,6 +25,21 @@ VINT_t component;
 using std::cout;
 using std::cin;
 
+//function to find sum of weights of edges of the minimum spanning tree
+int spanningTree(int V,  VV_t adj[]){
+    VINT_t ds(V);
+    for(int i=0; i<V;i++)ds[i]=i; //initialization
+    VINT_t rank(V,1); //height?
+    std::priority_queue<std::pair<int, std::pair<int, int>>, std::vector<std::pair<int, std::pair<int, int>>>, std::greater<std::pair<int, std::pair<int, int>>>>;
+
+    for(int i=0; i<V; i++){
+        VV_t v =adj[i];
+        for(VINT_t x:v){
+            
+        }
+    }
+}
+
 int main() {
     setlocale(LC_ALL,  "rus");
 
