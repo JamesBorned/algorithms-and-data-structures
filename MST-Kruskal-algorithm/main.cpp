@@ -11,10 +11,13 @@
 
 const int N = 100;
 int SCC = 0; // количество сильно связных компонент связности
+int numberOfEdges = 0;
+int numberOfLoops = 0;
 
 typedef std::vector<std::vector<int>>  VV_t;
 VV_t G; // directed graph
 VV_t onlyV; // only vertexes without edges
+VV_t Edges;
 VV_t IG; // inverted directed graph
 VV_t StrongConComp; // strongly connected components
 
@@ -27,13 +30,14 @@ VINT_t component;
 VINT_t Parent;
 VINT_t Rank;
 
-typedef std::vector
+//typedef std::vector
 using std::cout;
 using std::cin;
+using std::sort;
 
-//bool cmp(VINT_t &a, VINT_t &b){
-//    return a[2] < b[2];
-//}
+bool cmp(VINT_t &a, VINT_t &b){
+    return a[2] < b[2];
+}
 //
 void makeSet(int n){
     for (int i=0; i<n; i++){
@@ -41,52 +45,115 @@ void makeSet(int n){
         Rank[i] = 0;
     }
 }
-//
-//int findParent(VINT_t &parent, int node){
-//    if(parent[node] == node){
-//        return node;
+
+VV_t convertAdjMatrixToListOfEdges (int n, VV_t &edges) {
+    //int i = 0;
+    //while (1) {
+    for (int i = 0; i < edges.size(); ++i) {
+        for (int j = i; j < n; ++j) {
+            if (G[i][j] != 0) {
+                edges[i].push_back(i);
+                edges[i].push_back(j);
+                edges[i].push_back(G[i][j]);
+            }
+        }
+
+    }
+
+}
+
+
+//                int first = i;
+//                int last = j;
+//                int weight = G[i][j];
+//                edges[i][0] = first;
+//                edges[i][1] = last;
+//                edges[i][2] = weight;
+//                cout << edges[i][0] << " " << edges[i][1] << " " << edges[i][2] << "\t";
+//                cout << "\n";
+
+
+
+
+//        ++i;
+//        if (i < n)
+//            continue;
+//        else
+//            break;
+
+
+//    for (int k = 0; k < 30; ++k) {
+//        for (int j = 0; j < 3; ++j){
+//            cout << Edges[k][j] << "\t";
+//        }
+//        cout << "\n";
 //    }
-//    return parent[node] = findParent(parent, parent[node]);
+//}
+
+    //for (int i=0; i < n; ++i){
+        //for (int j=n-1; j > i; --j){
+
+
+
+//    for (int i = 0; i < 30; ++i){
+//        for (int j = 0; j < 3; ++j){
+//            cout << Edges[i][j] << "\t";
+//        }
+//        cout << "\n";
+//    }
+
+
 //}
 //
-//void unionSet(int u, int v, VINT_t &parent, VINT_t &rank){
-//    u = findParent(parent, u);
-//    v = findParent(parent, v);
+int findParent(int node){
+    if(Parent[node] == node){
+        return node;
+    }
+    return Parent[node] = findParent(Parent[node]);
+}
 //
-//    if (rank[u] < rank[v]) {
-//        parent[u] = v;
-//    }
-//    else if (rank[v] < rank[u]) {
-//        parent[v] = u;
-//    }
-//    else {
-//        parent[v] = u;
-//        rank[u]++;
-//    }
-//}
+void Union(int u, int v){
+    u = findParent(u);
+    v = findParent(v);
+
+    if (Rank[u] < Rank[v]) {
+        Parent[u] = v;
+    }
+    else if (Rank[v] < Rank[u]) {
+        Parent[v] = u;
+    }
+    else {
+        Parent[v] = u;
+        Rank[u]++;
+    }
+}
 //
 ////int findMinSpanTree(VV_t &edges, int n){
-void findMinSpanTree(int n){
+int findMinSpanTree(int n) {
 //    std::sort(edges.begin(), edges.end(), cmp);
 //    VINT_t parent(n);
 //    VINT_t rank(n);
 //
-    makeSet(n);
+        makeSet(n);
+
+        convertAdjMatrixToListOfEdges(n, Edges);
+
+        std::sort(Edges.begin(), Edges.end(), cmp);
 //
-//    int minWeight = 0;
+    int minWeight = 0;
 //
-//    for (int i=0; i<edges.size(); i++){
-//        int u = findParent(parent, edges[i][0]);
-//        int v = findParent(parent, edges[i][1]);
-//
-//        int weight = edges[i][2];
-//
-//        if (u != v){
-//            minWeight += weight;
-//            unionSet(u, v, parent, rank);
-//        }
-//    }
-//    return minWeight;
+    for (int i=0; i<Edges.size(); i++){
+        int u = findParent(Edges[i][0]);
+        int v = findParent(Edges[i][1]);
+
+        int weight = Edges[i][2];
+
+        if (u != v){
+            minWeight += weight;
+            Union(u, v);
+        }
+    }
+    return minWeight;
 }
 
 //int findparent(int element, VINT_t ds){
@@ -188,14 +255,25 @@ int main() {
 // изменить размер вектора на m элементов типа vector<int> , каждый из которых имеет размер  m
         G.resize(n, VINT_t(n));
         onlyV.resize(n, VINT_t(n));
+        //Edges.resize(n*n, VINT_t(3));
         //IG.resize(n, VINT_t(n));
 
 // Reading the matrix
         for (int i=0; i<n; ++i){
             for (int j=0; j<n; ++j){
                 in >> G[i][j];
+                if (i != j && G[i][j] != 0){
+                    ++numberOfEdges;
+                }
+                else if (i == j && G[i][j] != 0){
+                    ++numberOfLoops;
+                }
             }
         }
+
+        Edges.resize(numberOfEdges / 2 + numberOfLoops, VINT_t(3));
+
+        cout << Edges.size() << '\n';
 // Creating an empty graph
         for (int i=0; i<n; ++i){
             for (int j=0; j<n; ++j){
@@ -225,6 +303,109 @@ int main() {
             cout << "\n";
         }
 
+        cout << "\n";
+
+        for (int i = 0; i < Edges.size(); ++i){
+            for (int j = 0; j < Edges[i].size(); ++j){
+                cout << Edges[i][j] << "\t";
+            }
+            cout << "\n";
+        }
+
+        //makeSet(n);
+
+        convertAdjMatrixToListOfEdges (n, Edges);
+        cout << "\n";
+        for (int i = 0; i < Edges.size(); ++i){
+            for (int j = 0; j < Edges[i].size(); ++j){
+                cout << Edges[i][j] << "\t";
+            }
+            cout << "\n";
+
+        }
+
+        sort(Edges.begin(), Edges.end(), cmp);
+
+        for (int i = 0; i < Edges.size(); ++i){
+            for (int j = 0; j < Edges[i].size(); ++j){
+                cout << Edges[i][j] << "\t";
+            }
+            cout << "\n";
+        }
+
+//        for (int i = 0; i < n; ++i) {
+//            for (int j = i; j < n; ++j) {
+//                if (G[i][j] != 0) {
+//                cout << Edges[i][0] << " " << Edges[i][1] << " " << Edges[i][2] << "\t";
+//                cout << "\n";
+//                }
+//            }
+//
+//        }
+
+//        for (int i = 0; i < Edges.size(); ++i){
+//            for (int j = 0; i < Edges.size(); ++i)
+//        }
+//        int i=0;
+//        while (1){
+//            cout << '\n';
+//            cout << Edges[i][0] << " " << Edges[i][1] << " " << Edges[i][2] << "\t";
+//            cout << '\n';
+//            break;
+//        }
+
+//        cout << '\n';
+//        cout << Edges[0][0] << " " << Edges[0][1] << " " << Edges[0][2] << "\t";
+//        cout << '\n';
+//        cout << Edges[1][0] << " " << Edges[2][1] << " " << Edges[3][2] << "\t";
+
+//        int i = 0;
+//        while (1) {
+//            for (int j = i; j < n; ++j) {
+//
+//                    cout << Edges[i][0] << " " << Edges[i][1] << " " << Edges[i][2] << "\t";
+//                    cout << "\n";
+//
+//            }
+//            ++i;
+//            if (i < n)
+//                continue;
+//            else
+//                break;
+//        }
+
+//        for (int i=0; i<Edges.size();++i){
+//            cout << Edges[i][0] << " " << Edges[i][1] << " " << Edges[i][2] << "\t";
+//            cout << "\n";
+//        }
+
+        //sort(Edges.begin(), Edges.end(), cmp);
+
+//        for (int i=0; i<Edges.size();++i){
+//            cout << Edges[i][0] << " " << Edges[i][1] << " " << Edges[i][2] << "\t";
+//            cout << "\n";
+//        }
+
+
+//
+//        int minWeight = 0;
+////
+//        for (int i=0; i<Edges.size(); i++){
+//            int u = findParent(Edges[i][0]);
+//            int v = findParent(Edges[i][1]);
+//
+//            int weight = Edges[i][2];
+//
+//            if (u != v){
+//                minWeight += weight;
+//                Union(u, v);
+//            }
+//        }
+//        cout << minWeight;
+        //convertAdjMatrixToAdjList (n);
+
+
+
 //        for (int i = 0; i < n; ++i){
 //            for (int j = 0; j < n; ++j){
 //                cout << IG[i][j] << "\t";
@@ -233,7 +414,7 @@ int main() {
 //        }
 //
 //        findStrongConComp(n);
-        findMinSpanTree(n);
+        //findMinSpanTree(n);
 
         in.close();
     }
