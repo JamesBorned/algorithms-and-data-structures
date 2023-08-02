@@ -34,6 +34,7 @@ VINT_t Rank;
 using std::cout;
 using std::cin;
 using std::sort;
+using std::all_of;
 
 bool cmp(VINT_t &a, VINT_t &b){
     return a[2] < b[2];
@@ -57,9 +58,36 @@ VV_t convertAdjMatrixToListOfEdges (int n, VV_t &edges) {
                 edges[i].push_back(G[i][j]);
             }
         }
-
-    }
-
+     }
+    for (int i = 0; i < edges.size(); ++i) {
+        if (all_of(edges[i].begin(), edges[i].end(),  [](int k) { return k==0; } ) == 1){
+            edges[i].clear();
+            edges[i].shrink_to_fit();
+        }
+        else if (edges[i].size() != 3 && all_of(edges[i].begin(), edges[i].end(),  [](int k) { return k==0; } ) == 0){
+                unsigned long long countOfSubvectors = edges[i].size() / 3;
+               // cout <<  countOfSubvectors;
+            // каждая итерация этого цикла обрабатывает следующий набор n элементов
+            // и сохраняет его в векторе по j-ому индексу в
+            for  (int j = 0; j < countOfSubvectors; ++j){
+                // получаем диапазон для следующего набора n элементов
+                auto start_itr = std::next(edges[i].cbegin(), j*3);
+                auto end_itr = std::next(edges[i].cbegin(), j*3 + 3);
+                cout << edges.size() << "1:  ";
+                // выделяем память для подвектора
+                edges.resize(edges.size() + countOfSubvectors - 1, VINT_t (edges[i].size())); // - 1 - т.к. учитывается память, выделенная под тот, длинный вектор
+                edges[edges.size() - countOfSubvectors + 1].resize(3);
+                cout << edges.size() << "2: ";
+                edges.resize(edges.size(), VINT_t (edges[i].size()));
+                // копируем элементы из входного диапазона в подвектор
+                std::copy(start_itr, end_itr, edges[edges.size() - countOfSubvectors + 1].begin());
+//
+//
+//
+            }
+         }
+   }
+    return edges;
 }
 
 
@@ -314,24 +342,24 @@ int main() {
 
         //makeSet(n);
 
-        convertAdjMatrixToListOfEdges (n, Edges);
+        VV_t edges = convertAdjMatrixToListOfEdges (n, Edges);
         cout << "\n";
-        for (int i = 0; i < Edges.size(); ++i){
-            for (int j = 0; j < Edges[i].size(); ++j){
-                cout << Edges[i][j] << "\t";
+        for (int i = 0; i < edges.size(); ++i){
+            for (int j = 0; j < edges[i].size(); ++j){
+                cout << edges[i][j] << "\t";
             }
             cout << "\n";
 
         }
 
-        sort(Edges.begin(), Edges.end(), cmp);
-
-        for (int i = 0; i < Edges.size(); ++i){
-            for (int j = 0; j < Edges[i].size(); ++j){
-                cout << Edges[i][j] << "\t";
-            }
-            cout << "\n";
-        }
+//        sort(edges.begin(), edges.end(), cmp);
+//
+//        for (int i = 0; i < edges.size(); ++i){
+//            for (int j = 0; j < edges[i].size(); ++j){
+//                cout << edges[i][j] << "\t";
+//            }
+//            cout << "\n";
+//        }
 
 //        for (int i = 0; i < n; ++i) {
 //            for (int j = i; j < n; ++j) {
