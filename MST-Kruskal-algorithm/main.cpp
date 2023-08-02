@@ -386,11 +386,22 @@ int main() {
             int weight = edges[i][2];
 
             if (u != v){
+                onlyV[edges[i][0]][edges[i][1]] = weight;
+                onlyV[edges[i][1]][edges[i][0]] = weight;
                 minWeight += weight;
                 Union(u, v);
             }
         }
         cout << minWeight;
+
+        cout << "\n";
+
+        for (int i = 0; i < n; ++i){
+            for (int j = 0; j < n; ++j){
+                cout << onlyV[i][j] << "\t";
+            }
+            cout << "\n";
+        }
 
 //        for (int i = 0; i < n; ++i) {
 //            for (int j = i; j < n; ++j) {
