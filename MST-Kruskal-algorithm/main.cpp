@@ -85,8 +85,19 @@ VV_t convertAdjMatrixToListOfEdges (int n, VV_t &edges) {
 //
 //
             }
+            edges[i].clear();
+            edges[i].shrink_to_fit();
          }
+
    }
+    for (int i = 0; i < edges.size();){
+        if (edges[i].empty()){
+            edges.erase(edges.begin() + i);
+        }
+        else
+            ++i;
+    }
+    cout << "3: " << edges.size();
     return edges;
 }
 
