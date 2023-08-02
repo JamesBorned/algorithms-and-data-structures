@@ -13,6 +13,7 @@ const int N = 100;
 int SCC = 0; // количество сильно связных компонент связности
 int numberOfEdges = 0;
 int numberOfLoops = 0;
+int minWeight = 0;
 
 typedef std::vector<std::vector<int>>  VV_t;
 VV_t G; // directed graph
@@ -42,8 +43,10 @@ bool cmp(VINT_t &a, VINT_t &b){
 //
 void makeSet(int n){
     for (int i=0; i<n; i++){
-        Parent[i] = i;
-        Rank[i] = 0;
+        //Parent[i] = i;
+        //Rank[i] = 0;
+        Parent.push_back(i);
+        Rank.push_back(0);
     }
 }
 
@@ -73,11 +76,11 @@ VV_t convertAdjMatrixToListOfEdges (int n, VV_t &edges) {
                 // получаем диапазон для следующего набора n элементов
                 auto start_itr = std::next(edges[i].cbegin(), j*3);
                 auto end_itr = std::next(edges[i].cbegin(), j*3 + 3);
-                cout << edges.size() << "1:  ";
+                cout << "1: " << edges.size() << " ";
                 // выделяем память для подвектора
                 edges.resize(edges.size() + countOfSubvectors - 1, VINT_t (edges[i].size())); // - 1 - т.к. учитывается память, выделенная под тот, длинный вектор
                 edges[edges.size() - countOfSubvectors + 1].resize(3);
-                cout << edges.size() << "2: ";
+                cout << "2: " << edges.size() << " ";
                 edges.resize(edges.size(), VINT_t (edges[i].size()));
                 // копируем элементы из входного диапазона в подвектор
                 std::copy(start_itr, end_itr, edges[edges.size() - countOfSubvectors + 1].begin());
@@ -97,7 +100,7 @@ VV_t convertAdjMatrixToListOfEdges (int n, VV_t &edges) {
         else
             ++i;
     }
-    cout << "3: " << edges.size();
+    cout << "3: " << edges.size() << " ";
     return edges;
 }
 
@@ -311,6 +314,8 @@ int main() {
         }
 
         Edges.resize(numberOfEdges / 2 + numberOfLoops, VINT_t(3));
+        //Edges.resize(numberOfEdges / 2 + numberOfLoops, VINT_t(3));
+
 
         cout << Edges.size() << '\n';
 // Creating an empty graph
@@ -351,7 +356,7 @@ int main() {
             cout << "\n";
         }
 
-        //makeSet(n);
+        makeSet(n);
 
         VV_t edges = convertAdjMatrixToListOfEdges (n, Edges);
         cout << "\n";
@@ -363,14 +368,29 @@ int main() {
 
         }
 
-//        sort(edges.begin(), edges.end(), cmp);
-//
-//        for (int i = 0; i < edges.size(); ++i){
-//            for (int j = 0; j < edges[i].size(); ++j){
-//                cout << edges[i][j] << "\t";
-//            }
-//            cout << "\n";
-//        }
+        cout << "\n";
+
+       sort(edges.begin(), edges.end(), cmp);
+
+        for (int i = 0; i < edges.size(); ++i){
+            for (int j = 0; j < edges[i].size(); ++j){
+                cout << edges[i][j] << "\t";
+            }
+            cout << "\n";
+        }
+
+        for (int i=0; i<edges.size(); i++){
+            int u = findParent(edges[i][0]);
+            int v = findParent(edges[i][1]);
+
+            int weight = edges[i][2];
+
+            if (u != v){
+                minWeight += weight;
+                Union(u, v);
+            }
+        }
+        cout << minWeight;
 
 //        for (int i = 0; i < n; ++i) {
 //            for (int j = i; j < n; ++j) {
