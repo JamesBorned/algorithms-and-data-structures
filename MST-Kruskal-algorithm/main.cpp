@@ -493,16 +493,15 @@ int main() {
     }
 
     // Writing to the file consist of the connected components and its number
-//    if(out.is_open()) {
-//        for (int i = 0; i < StrongConComp.size(); i++) {
-//            for (int j = 0; j < StrongConComp[i].size(); j++) {
-//                out << StrongConComp[i][j] << " ";
-//            }
-//            out << '\n';
-//        }
-//        out << "A number of connected components is " << SCC << '\n';
-//        out.close();
-//    }
+    if(out.is_open()) {
+        for (int i = 0; i < onlyV.size(); i++) {
+            for (int j = 0; j < onlyV[i].size(); j++) {
+                out << onlyV[i][j] << " ";
+            }
+            out << '\n';
+        }
+        out.close();
+    }
 
     return 0;
 }
