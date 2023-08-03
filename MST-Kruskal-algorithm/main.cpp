@@ -14,11 +14,8 @@ int minWeight = 0;
 
 typedef std::vector<std::vector<int>>  VV_t;
 VV_t G; // directed graph
-VV_t onlyV; // only vertexes without edges
+VV_t MST; // only vertexes without edges
 VV_t Edges;
-
-typedef std::vector<bool> VBOOL_t;
-VBOOL_t used; // traversed vertexes
 
 typedef std::vector<int> VINT_t;
 VINT_t Parent;
@@ -28,11 +25,13 @@ using std::cout;
 using std::cin;
 using std::sort;
 using std::all_of;
-
+// The comparator for sorting of edges by non-decreasing
 bool cmp(VINT_t &a, VINT_t &b){
     return a[2] < b[2];
 }
-
+// Forming subsets of a single vertex:
+// 1) a parent of a single vertex is this vertex;
+// 2) a height of root node is 0
 void makeSet(int n){
     for (int i=0; i<n; i++){
         Parent.push_back(i);
@@ -41,6 +40,7 @@ void makeSet(int n){
 }
 
 VV_t convertAdjMatrixToListOfEdges (int n, VV_t &edges) {
+    // Add all edges with its weights to 'edges'
     for (int i = 0; i < edges.size(); ++i) {
         for (int j = i; j < n; ++j) {
             if (G[i][j] != 0) {
@@ -50,34 +50,48 @@ VV_t convertAdjMatrixToListOfEdges (int n, VV_t &edges) {
             }
         }
      }
+    // Edges originating from the same vertex are in a same vector, which size is not equal 3.
     for (int i = 0; i < edges.size(); ++i) {
+        // Delete zero vectors
         if (all_of(edges[i].begin(), edges[i].end(),  [](int k) { return k==0; } ) == 1){
             edges[i].clear();
             edges[i].shrink_to_fit();
         }
+        // Divide vectors, which size is greater than 3, into sub-vectors
         else if (edges[i].size() != 3 && all_of(edges[i].begin(), edges[i].end(),  [](int k) { return k==0; } ) == 0){
                 unsigned long long countOfSubvectors = edges[i].size() / 3;
                // cout <<  countOfSubvectors;
             // каждая итерация этого цикла обрабатывает следующий набор n элементов
-            // и сохраняет его в векторе по j-ому индексу в
+            // Each iteration of this loop processes the following set of n elements
             for  (int j = 0; j < countOfSubvectors; ++j){
+
                 // получаем диапазон для следующего набора n элементов
+                // Get the range for the following set of elements
                 auto start_itr = std::next(edges[i].cbegin(), j*3);
                 auto end_itr = std::next(edges[i].cbegin(), j*3 + 3);
+
                 //cout << "1: " << edges.size() << " ";
+
                 // выделяем память для подвектора
+                // Allocate memory for sub-vector
                 edges.resize(edges.size() + countOfSubvectors - 1, VINT_t (edges[i].size())); // - 1 - т.к. учитывается память, выделенная под тот, длинный вектор
                 edges[edges.size() - countOfSubvectors + 1].resize(3);
+
                 //cout << "2: " << edges.size() << " ";
+
                 edges.resize(edges.size(), VINT_t (edges[i].size()));
-                // копируем элементы из входного диапазона в подвектор
+
+                // копируем элементы из входного диапазона в конец 'edges'
+                // Copying elements from the input range to the end of 'edges'
                 std::copy(start_itr, end_itr, edges[edges.size() - countOfSubvectors + 1].begin());
             }
+            // Delete useless vectors
             edges[i].clear();
             edges[i].shrink_to_fit();
          }
 
    }
+    // Delete empty vectors
     for (int i = 0; i < edges.size();){
         if (edges[i].empty()){
             edges.erase(edges.begin() + i);
@@ -85,19 +99,21 @@ VV_t convertAdjMatrixToListOfEdges (int n, VV_t &edges) {
         else
             ++i;
     }
+
     //cout << "3: " << edges.size() << " ";
+
     return edges;
 }
-
 
 int findParent(int node){
     if(Parent[node] == node){
         return node;
     }
+    // Path compression
     return Parent[node] = findParent(Parent[node]);
 }
 
-//
+// Combining subsets of vertices
 void Union(int u, int v){
     u = findParent(u);
     v = findParent(v);
@@ -114,29 +130,56 @@ void Union(int u, int v){
     }
 }
 //
-////int findMinSpanTree(VV_t &edges, int n){
-VV_t findMinSpanTree(int n, VV_t &edges) {
+void findMinSpanTree(int n) {
 
-        makeSet(n);
+    makeSet(n);
 
-        convertAdjMatrixToListOfEdges(n, Edges);
+    Edges = convertAdjMatrixToListOfEdges (n, Edges);
 
-        std::sort(Edges.begin(), Edges.end(), cmp);
-//
-    int minWeight = 0;
-//
+    cout << "\n";
+// Writing a list of edges
+    for (int i = 0; i < Edges.size(); ++i){
+        for (int j = 0; j < Edges[i].size(); ++j){
+            cout << Edges[i][j] << "\t";
+        }
+        cout << "\n";
+    }
+
+    cout << "\n";
+
+    sort(Edges.begin(), Edges.end(), cmp);
+// // Writing a list of edges after sorting
+    for (int i = 0; i < Edges.size(); ++i){
+        for (int j = 0; j < Edges[i].size(); ++j){
+            cout << Edges[i][j] << "\t";
+        }
+        cout << "\n";
+    }
+
     for (int i=0; i<Edges.size(); i++){
         int u = findParent(Edges[i][0]);
         int v = findParent(Edges[i][1]);
 
         int weight = Edges[i][2];
-
+        // If edge doesn't belong to a cycle
         if (u != v){
+            MST[Edges[i][0]][Edges[i][1]] = weight;
+            MST[Edges[i][1]][Edges[i][0]] = weight;
             minWeight += weight;
             Union(u, v);
         }
     }
-    return minWeight;
+    cout << minWeight;
+
+    cout << "\n";
+// Writing the adjacency matrix of MST
+    for (int i = 0; i < n; ++i){
+        for (int j = 0; j < n; ++j){
+            cout << MST[i][j] << "\t";
+        }
+        cout << "\n";
+    }
+
 }
 
 
@@ -158,11 +201,6 @@ int main() {
             in >> temp; // reading numbers from the file
             count++;
         }
-// Вначале переведём каретку в потоке в начало файла
-// istream&seekg(streamoff offset, ios_base::seekdir) =>
-//параметры: смещение в буфере потока, направление потока
-// beg - смещение от начала буфера потока, cur - смещение от
-// текущей позиции, end - от конца
 // First, let's move the carriage in the stream to the beginning of the file
 // istream&seekg(streamoff offset, ios_base::seekdir) =>
 //parameters: offset in the stream buffer, flow direction
@@ -189,7 +227,7 @@ int main() {
         int tmp;
 // изменить размер вектора на m элементов типа vector<int> , каждый из которых имеет размер  m
         G.resize(n, VINT_t(n));
-        onlyV.resize(n, VINT_t(n));
+        MST.resize(n, VINT_t(n));
 
 // Reading the matrix
         for (int i=0; i<n; ++i){
@@ -210,7 +248,7 @@ int main() {
 // Creating an empty graph
         for (int i=0; i<n; ++i){
             for (int j=0; j<n; ++j){
-                onlyV[i][j] = 0;
+                MST[i][j] = 0;
             }
         }
 
@@ -225,7 +263,7 @@ int main() {
 
         for (int i = 0; i < n; ++i){
             for (int j = 0; j < n; ++j){
-                cout << onlyV[i][j] << "\t";
+                cout << MST[i][j] << "\t";
             }
             cout << "\n";
         }
@@ -239,54 +277,7 @@ int main() {
             cout << "\n";
         }
 
-        makeSet(n);
-
-        VV_t edges = convertAdjMatrixToListOfEdges (n, Edges);
-        cout << "\n";
-        for (int i = 0; i < edges.size(); ++i){
-            for (int j = 0; j < edges[i].size(); ++j){
-                cout << edges[i][j] << "\t";
-            }
-            cout << "\n";
-
-        }
-
-        cout << "\n";
-
-       sort(edges.begin(), edges.end(), cmp);
-
-        for (int i = 0; i < edges.size(); ++i){
-            for (int j = 0; j < edges[i].size(); ++j){
-                cout << edges[i][j] << "\t";
-            }
-            cout << "\n";
-        }
-
-        for (int i=0; i<edges.size(); i++){
-            int u = findParent(edges[i][0]);
-            int v = findParent(edges[i][1]);
-
-            int weight = edges[i][2];
-
-            if (u != v){
-                onlyV[edges[i][0]][edges[i][1]] = weight;
-                onlyV[edges[i][1]][edges[i][0]] = weight;
-                minWeight += weight;
-                Union(u, v);
-            }
-        }
-        cout << minWeight;
-
-        cout << "\n";
-
-        for (int i = 0; i < n; ++i){
-            for (int j = 0; j < n; ++j){
-                cout << onlyV[i][j] << "\t";
-            }
-            cout << "\n";
-        }
-
-        //findMinSpanTree(n);
+        findMinSpanTree(n);
 
         in.close();
     }
@@ -296,9 +287,9 @@ int main() {
 
     // Writing to the file consist of the connected components and its number
     if(out.is_open()) {
-        for (int i = 0; i < onlyV.size(); i++) {
-            for (int j = 0; j < onlyV[i].size(); j++) {
-                out << onlyV[i][j] << " ";
+        for (int i = 0; i < MST.size(); i++) {
+            for (int j = 0; j < MST[i].size(); j++) {
+                out << MST[i][j] << " ";
             }
             out << '\n';
         }
