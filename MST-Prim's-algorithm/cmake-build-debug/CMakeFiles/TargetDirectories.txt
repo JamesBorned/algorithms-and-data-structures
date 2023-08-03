@@ -1,0 +1,3 @@
+C:/Users/HP/source/repos/algorithms-and-data-structures/MST-Prim's-algorithm/cmake-build-debug/CMakeFiles/MST_Prim_s_algorithm.dir
+C:/Users/HP/source/repos/algorithms-and-data-structures/MST-Prim's-algorithm/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/HP/source/repos/algorithms-and-data-structures/MST-Prim's-algorithm/cmake-build-debug/CMakeFiles/rebuild_cache.dir
