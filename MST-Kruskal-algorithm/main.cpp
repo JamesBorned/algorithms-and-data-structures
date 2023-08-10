@@ -13,7 +13,7 @@ int numberOfLoops = 0;
 int minWeight = 0;
 
 typedef std::vector<std::vector<int>>  VV_t;
-VV_t G; // directed graph
+VV_t G; // graph
 VV_t MST; // only vertexes without edges
 VV_t Edges;
 
