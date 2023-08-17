@@ -6,98 +6,160 @@
 */
 
 #include <iostream>
+#include <fstream>
+#include <vector>
 
-using namespace std;
+using std::cin;
+using std::cout;
 
-#define INF 999
+typedef std::vector<std::vector<int>>  VV_t;
+VV_t G; // graph
 
-int V, src, cost[100][100];
-int dist[100];
-int parent[100];
+typedef std::vector<int> VINT_t;
+VINT_t Parent;
+VINT_t Dist;
 
-bool used[100]  = {0};
+typedef std::vector<bool> VBOOL_t;
+VBOOL_t used;
 
-void init(){
-// инициализация меток каждой из вершин бесконечностью
-    for(int i=0; i < V; ++i){
-        dist[i] = INF;
-        //parent[i] = i;
+const int INF = INT_MAX;
+
+int src = 0;
+
+void Init(int n){
+// Initialization of labels of each vertex by infinity
+    for(int i = 0; i < n; ++i){
+        Dist[i] = INF;
     }
 
-    dist[src] = 0;
-    parent[src] = src;
+    Dist[src] = 0;
+    Parent[src] = src;
 }
 
-int getNearest(){
-    int minvalue = INF;
-    int minnode = 0;
-    for(int i = 0; i < V; ++i){
-        if(!used[i] && dist[i] < minvalue){
-            minvalue = dist[i];
-            minnode = i;
+int getNearest(int n){
+    int minDist = INF;
+    int minDistVert = 0;
+
+    for(int i = 0; i < n; ++i){
+        if(!used[i] && Dist[i] < minDist){
+            minDist = Dist[i];
+            minDistVert = i;
         }
     }
-    return minnode;
+
+    return minDistVert;
 }
 
-void dijkstra(){
-    for(int i=0; i < V; ++i){
-        int nearest = getNearest();
-        used[nearest] = true;
+void findShortPathsDijkstra(int n){
 
-        for(int v = 0; v < V; ++v){
-            if(dist[nearest] + cost[nearest][v] < dist[v] && cost[nearest][v] != 0){
-                dist[v] = dist[nearest] + cost[nearest][v];
-                parent[v] = nearest;
+    for(int i = 0; i < n; ++i){
+
+        int  minDistVert = getNearest(n);
+
+        used[minDistVert] = true;
+
+        for(int adj = 0; adj < n; ++adj){
+
+// If sum of a label of the nearest vertex and weight of an incident edge less,
+// than a label of its adjacent vertex
+            if(Dist[minDistVert] + G[minDistVert][adj] < Dist[adj] && G[minDistVert][adj] != 0){
+                Dist[adj] = Dist[minDistVert] + G[minDistVert][adj];
+                Parent[adj] = minDistVert;
             }
         }
     }
 }
 
-void display(){
-    cout<<"Node: \t\t\tCost :\t\t\tPath";
+void writeResultToFile(int n, std::ofstream& out){
+    out<<"FROM "<<src<<" VERTEX \n";
 
-    for(int i = 0; i < V; ++i){
-        cout<<i<<"\t\t\t"<< dist[i] << "\t\t\t" << " ";
+    out<<"Node: \t\t\tCost :\t\t\tPath:\n";
 
-        cout<<i<<" ";
+    for(int i = 0; i < n; ++i){
+        out<<i<<"\t\t\t\t\t"<< Dist[i] << "\t\t\t\t\t" << i << " ";
 
-        int parnode = parent[i];
+        int parVert = Parent[i];
 
-        while (parnode != src){
-            cout<<" <- "<< parnode << " ";
-            parnode = parent[parnode];
-        }
-        cout<<endl;
+        do {
+            out<<" <- "<< parVert << " ";
+            parVert = Parent[parVert];
+        } while (parVert != src);
+
+        out<<'\n';
     }
-
 }
 
 int main() {
 
-    cin>>V;
-    for(int i=0; i<V; ++i){
-        for(int j=0; j<V; ++j){
-            cin>>cost[i][j];
+    setlocale(LC_ALL, "rus");
+
+//Создаём файловый поток и связываем его с файлом
+//Create a file stream and link it to the file
+    std::ifstream in("..\\adjacency_matrices\\weighted\\m2.txt");
+    std::ofstream out("..\\output.txt");
+
+
+    if (in.is_open()) {
+
+        int count = 0; // the number of numbers in the file
+        int temp;
+
+        while (!in.eof()) {
+            in >> temp; // reading numbers from the file
+            count++;
         }
+// First, let's move the carriage in the stream to the beginning of the file
+// istream&seekg(streamoff offset, ios_base::seekdir) =>
+//parameters: offset in the stream buffer, flow direction
+// beg - offset from the beginning of the stream buffer, cur - offset from
+// the current position, end - from the end
+        in.seekg(0, std::ios::beg);
+        in.clear();
+
+        int count_space = 0; // a number of spaces
+        char symbol;
+
+        while (!in.eof()) {
+            in.get(symbol); // reading the next character
+            if (symbol == ' ')
+                count_space++;
+            if (symbol == '\n')
+                break;
+        }
+// Jump to the beginning of the file
+        in.seekg(0, std::ios::beg);
+        in.clear();
+// Matrix formation
+        int n = count_space + 1; // число столбцов
+// изменить размер вектора на n элементов типа vector<int>, каждый из которых имеет размер  n
+        G.resize(n, VINT_t(n));
+        Parent.resize(n);
+        Dist.resize(n);
+        used.resize(n);
+
+// Reading the matrix
+        for (int i=0; i<n; ++i){
+            for (int j=0; j<n; ++j){
+                in >> G[i][j];
+            }
+        }
+
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < n; ++j) {
+                cout << G[i][j] << "\t";
+            }
+            cout << "\n";
+        }
+
+        cout << "Enter the number of the vertex,\n from which you want to find the shortest paths to other vertices:\t";
+
+        cin >> src;
+
+        Init(n);
+        findShortPathsDijkstra(n);
+        writeResultToFile(n, out);
+
+        return 0;
     }
-    cin>>src;
-    init();
-    dijkstra();
-    display();
-
-
-
-    return 0;
 }
 
-/*
- * 0 4 999 999 999 999 999 999 999
-    4 0   8   999 999 999 999   8   999
-  999 8 0 7 999  999 999 2
-999 999 7 0 9 14 999 999 999
-999 999 999 9 0 10 999 999 999
-999 999 4 14 10 0 2 999 999
-999 999 999 999 999 2 0 1 6
-999 8 999 999 999 999 1 0 7
-999 999 2 999 999 999 6 7 0*/
