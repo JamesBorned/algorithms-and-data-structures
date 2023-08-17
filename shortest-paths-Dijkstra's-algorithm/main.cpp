@@ -51,6 +51,7 @@ int getNearest(int n){
 }
 
 void findShortPathsDijkstra(int n){
+    Init(n);
 
     for(int i = 0; i < n; ++i){
 
@@ -155,7 +156,6 @@ int main() {
 
         cin >> src;
 
-        Init(n);
         findShortPathsDijkstra(n);
         writeResultToFile(n, out);
 
