@@ -120,17 +120,21 @@ void findShortPathsBellmanFord(int n, VV_t& edges){
 
     for(int i = 0; i < n; ++i){
         for(int j = 0; j < edges.size(); ++j){
-           if (Dist[edges[j][0]] < INF && (Dist[edges[j][1]] > Dist[edges[j][0]] + edges[j][2])){
+           int u = edges[j][0];
+           int v = edges[j][1];
+           int weight = edges[j][2];
+
+           if (Dist[u] < INF && (Dist[v] > Dist[u] + weight)){
                 //Dist[edges[j][1]] = std::min(Dist[edges[j][1]], Dist[edges[j][0]] + edges[j][2]);
 
-                Dist[edges[j][1]] = Dist[edges[j][0]] + edges[j][2];
-                Parent[edges[j][1]] = edges[j][0];
+                Dist[v] = Dist[u] + weight;
+                Parent[v] = u;
            }
            // Inverse relaxation for a list of edges of an undirected graph
-            if (Dist[edges[j][1]] < INF && (Dist[edges[j][0]] > Dist[edges[j][1]] + edges[j][2])){
+            if (Dist[v] < INF && (Dist[u] > Dist[v] + weight)){
 
-                Dist[edges[j][0]] = Dist[edges[j][1]] + edges[j][2];
-                Parent[edges[j][0]] = edges[j][1];
+                Dist[u] = Dist[v] + weight;
+                Parent[u] = v;
             }
         }
     }
@@ -245,6 +249,8 @@ int main() {
         findShortPathsBellmanFord(n, Edges);
 
         writeResultToFile(n, out);
+
+        in.close();
 
         }
 
