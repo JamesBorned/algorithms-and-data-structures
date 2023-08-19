@@ -33,6 +33,7 @@ void Init(int n){
     }
 
     Dist[src] = 0;
+    Parent[src] = src;
 }
 
 VV_t convertAdjMatrixToListOfEdges (int n, VV_t &edges) {
@@ -106,12 +107,118 @@ void findShortPathsBellmanFord(int n, VV_t& edges){
 
     convertAdjMatrixToListOfEdges(n, edges);
 
-    for(int i = 1; i < n-1; ++i){
-        for(int j =  0; j < Edges.size(); ++j){
-            if (Dist[Edges[j][0]] < INF){
-                Dist[Edges[j][1]] = std::min(Dist[Edges[j][1]], Dist[Edges[j][0]] + Edges[j][2]);
-            }
+    VV_t otherEdges;
+
+    for (int i = 0; i < edges.size(); ++i){
+        for (int j = 0; j < edges[i].size(); ++j){
+            cout << edges[i][j] << "\t";
         }
+        cout << "\n";
+    }
+
+//    for (int i = 0; i < edges.size(); ++i){
+//
+//            if(edges[i][0] == src){
+//                cout << edges[i][0] << "\n";
+//                otherEdges.push_back(edges[i]);
+////                edges.insert(edges.begin(), Edge);
+//                edges[i].clear();
+//                edges[i].shrink_to_fit();
+////                edges.erase(edges.begin() + i);
+////                i--;
+//
+//            }
+////            edges.insert(edges.begin(), Edge);
+////
+////            if (edges[i] == Edge){
+////                    edges[i].clear();
+////                    edges[i].shrink_to_fit();
+////                    edges.erase(edges.begin() + i);
+////            }
+////
+////
+////
+////            edges.insert(edges.begin(), Edge);
+//
+//
+////        if (edges[i] == Edge){
+////            edges[i].clear();
+////            edges[i].shrink_to_fit();
+////        }
+//
+////       edges.insert(edges.begin(), Edge);
+//
+//
+//    }
+
+//    for (int i = 0; i < otherEdges.size(); ++i){
+//        for (int j = 0; j < otherEdges[i].size(); ++j){
+//            cout << otherEdges[i][j] << "\t";
+//        }
+//        cout << "\n";
+//    }
+//
+//        for(int i = 0; i < edges.size(); ++i){
+//            if (edges[i] == otherEdges[i]){
+//                edges[i].clear();
+//                edges[i].shrink_to_fit();
+//            }
+//        }
+
+//    for (auto & otherEdge : otherEdges){
+//        edges.insert(edges.begin(), otherEdge);
+//    }
+//
+//        for (int i = 0; i < edges.size();){
+//            if (edges[i].empty()){
+//                edges.erase(edges.begin() + i);
+//            }
+//            else
+//                ++i;
+//        }
+//
+//    edges.insert(edges.begin(), Edge);
+
+    for (int i = 0; i < edges.size(); ++i){
+        for (int j = 0; j < edges[i].size(); ++j){
+            cout << edges[i][j] << "\t";
+        }
+        cout << "\n";
+    }
+
+    cout << src;
+    cout << edges.size();
+
+    for(int i = 0; i < n; ++i){
+        for(int j = 0; j < edges.size(); ++j){
+           if (Dist[edges[j][0]] < INF && (Dist[edges[j][1]] > Dist[edges[j][0]] + edges[j][2])){
+                //Dist[edges[j][1]] = std::min(Dist[edges[j][1]], Dist[edges[j][0]] + edges[j][2]);
+
+                    Dist[edges[j][1]] = Dist[edges[j][0]] + edges[j][2];
+                    Parent[edges[j][1]] = edges[j][0];
+
+           }
+           // Inverse relaxation for a list of edges of an undirected graph
+            if (Dist[edges[j][1]] < INF && (Dist[edges[j][0]] > Dist[edges[j][1]] + edges[j][2])){
+                //Dist[edges[j][1]] = std::min(Dist[edges[j][1]], Dist[edges[j][0]] + edges[j][2]);
+
+                Dist[edges[j][0]] = Dist[edges[j][1]] + edges[j][2];
+                Parent[edges[j][0]] = edges[j][1];
+
+            }
+
+
+        }
+    }
+
+    for(int i = 0; i < n; ++i){
+        cout << Parent[i] << '\n';
+    }
+
+    cout << '\n';
+
+    for(int i = 0; i < n; ++i){
+        cout << Dist[i] << '\n';
     }
 }
 
@@ -194,9 +301,17 @@ int main() {
             }
         }
 
+
         Edges.resize(numberOfEdges / 2 + numberOfLoops, VINT_t(3));
 
         cout << Edges.size() << '\n';
+
+        for (int i = 0; i < Edges.size(); ++i){
+            for (int j = 0; j < Edges[i].size(); ++j){
+                cout << Edges[i][j] << "\t";
+            }
+            cout << "\n";
+        }
 
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < n; ++j) {
@@ -205,13 +320,68 @@ int main() {
             cout << "\n";
         }
 
+
         cout << "Enter the number of the vertex,\n from which you want to find the shortest paths to other vertices:\t";
 
         cin >> src;
 
-        findShortPathsBellmanFord(n, Edges);
-        writeResultToFile(n, out);
+        cout << '\n';
 
+        findShortPathsBellmanFord(n, Edges);
+        cout << '\n';
+        cout << "Enter the number of the vertex,\n from which you want to find the shortest paths to other vertices:\t";
+
+        cin >> src;
+
+        cout << '\n';
+
+        findShortPathsBellmanFord(n, Edges);
+        cout << '\n';
+        cout << "Enter the number of the vertex,\n from which you want to find the shortest paths to other vertices:\t";
+
+        cin >> src;
+
+        cout << '\n';
+
+        findShortPathsBellmanFord(n, Edges);
+        cout << '\n';
+        cout << "Enter the number of the vertex,\n from which you want to find the shortest paths to other vertices:\t";
+
+        cin >> src;
+
+        cout << '\n';
+
+        findShortPathsBellmanFord(n, Edges);
+        cout << "Enter the number of the vertex,\n from which you want to find the shortest paths to other vertices:\t";
+
+        cin >> src;
+
+        cout << '\n';
+
+        findShortPathsBellmanFord(n, Edges);
+        cout << '\n';
+
+//        writeResultToFile(n, out);
+//
+//        cout<<"FROM "<<src<<" VERTEX \n";
+//
+//        cout<<"Node: \t\t\tCost :\t\t\tPath:\n";
+
+//        for(int i = 0; i < n; ++i){
+//
+//            cout<<i<<"\t\t\t\t\t"<< Dist[i] << "\t\t\t\t\t" << i << " ";
+//
+//            int parVert = Parent[i];
+//
+//            do {
+//                cout<<" <- "<< parVert << " ";
+//                parVert = Parent[parVert];
+//            } while (parVert != src);
+//
+//            cout<<'\n';
+//        }
+
+        }
         return 0;
-    }
-}
+
+   }

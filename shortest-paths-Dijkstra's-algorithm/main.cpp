@@ -158,8 +158,10 @@ int main() {
 
         findShortPathsDijkstra(n);
         writeResultToFile(n, out);
+        
+        in.close();
+    }
 
         return 0;
-    }
 }
 
