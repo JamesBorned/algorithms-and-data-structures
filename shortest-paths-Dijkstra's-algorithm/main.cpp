@@ -81,10 +81,10 @@ void writeResultToFile(int n, std::ofstream& out){
 
         int parVert = Parent[i];
 
-        do {
+        while (parVert != src) {
             out<<" <- "<< parVert << " ";
             parVert = Parent[parVert];
-        } while (parVert != src);
+        }
 
         out<<'\n';
     }
