@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.21)
+project(BFS_the_number_and_composition_of_connected_components_in_an_undirected_graph)
+
+set(CMAKE_CXX_STANDARD 14)
+
+add_executable(BFS_the_number_and_composition_of_connected_components_in_an_undirected_graph main.cpp)
